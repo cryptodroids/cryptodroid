@@ -22,7 +22,7 @@ public class SecureSharedPreferences implements SharedPreferences {
     /**
      * Gets a SecureDefaultSharedPreferences using the EncyptionHelper provided.
      * <p/>
-     * Remember if you initilize this SharedPreferences with a different helper your data will be unreadable.
+     * Remember if you initialize this SharedPreferences with a different helper your data will be unreadable.
      *
      * @param context application context of some kind
      * @param helper  the {@link com.cryptodroids.encryption.EncryptionHelper} to use to encrypt/decrypt data
@@ -30,6 +30,25 @@ public class SecureSharedPreferences implements SharedPreferences {
     public static SharedPreferences getDefaultSharedPreference(Context context, EncryptionHelper helper) {
         final SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return new SecureSharedPreferences(defaultSharedPreferences, helper);
+    }
+
+    /**
+     * Gets a SharedPreferenceInstance by the name and mode passed in.
+     * Similar to {@link android.content.Context#getSharedPreferences(String, int)}
+     * <p/>
+     * Remember if you initialize this SharedPreferences with a different helper your data will be unreadable.
+     *
+     * @param name   Name of the SharedPreference file
+     * @param mode   SharedPrefs file mode
+     * @param helper the {@link com.cryptodroids.encryption.EncryptionHelper} to use to encrypt/decrypt data
+     * @see Context#MODE_PRIVATE
+     * @see Context#MODE_WORLD_READABLE
+     * @see Context#MODE_WORLD_WRITEABLE
+     * @see Context#MODE_MULTI_PROCESS
+     */
+    public static SharedPreferences getSharedPreference(Context context, String name, int mode, EncryptionHelper helper) {
+        final SharedPreferences sharedPreferences = context.getSharedPreferences(name, mode);
+        return new SecureSharedPreferences(sharedPreferences, helper);
     }
 
     private final SharedPreferences prefs;
