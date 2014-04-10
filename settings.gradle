@@ -1,1 +1,1 @@
-include ':encryption-core'
+include ':encryption-core', ':secure-preferences'
