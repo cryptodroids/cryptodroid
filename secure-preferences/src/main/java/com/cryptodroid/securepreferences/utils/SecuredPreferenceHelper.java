@@ -1,5 +1,6 @@
 package com.cryptodroid.securepreferences.utils;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.cryptodroids.encryption.EncryptionException;
@@ -21,22 +22,8 @@ public class SecuredPreferenceHelper {
 
     private final EncryptionHelper helper;
 
-    SecuredPreferenceHelper(EncryptionHelper helper) {
+    public SecuredPreferenceHelper(EncryptionHelper helper) {
         this.helper = helper;
-    }
-
-    /**
-     * Using Squares Okio methods to convert data into base64 string
-     */
-    protected String encode(byte[] input) {
-        return ByteString.of(input).base64();
-    }
-
-    /**
-     * Using Squares Okio method to convert Base64 string into a ByteArray
-     */
-    protected byte[] decode(String input) {
-        return ByteString.decodeBase64(input).toByteArray();
     }
 
     public <T> String encrypt(T object) {
@@ -51,7 +38,36 @@ public class SecuredPreferenceHelper {
         return result;
     }
 
-    private <T> String encryptToString(T object) throws EncryptionException {
+    public <T> T decrypt(SharedPreferences sharedPreferences, String key, T defValue) {
+        T value = defValue;
+        final String encryptedValue = sharedPreferences.getString(key, null);
+        if (encryptedValue != null) {
+            try {
+                value = decryptFromEncryptedString(encryptedValue);
+            } catch (EncryptionException e) {
+                Log.e("SecurePreference", "Failed to decrypt value", e);
+            }
+        }
+        return value;
+    }
+
+    protected <T> T decryptFromEncryptedString(String encyptedValue) throws EncryptionException {
+        T value;
+        try {
+            final byte[] decodedBytes = decode(encyptedValue);
+            final byte[] decoded = helper.decrypt(decodedBytes);
+            final Buffer buffer = new Buffer().write(decoded);
+            final ObjectInputStream objectInputStream = new ObjectInputStream(buffer.inputStream());
+            value = (T) objectInputStream.readObject();
+        } catch (IOException e) {
+            throw new EncryptionException(e);
+        } catch (ClassNotFoundException e) {
+            throw new EncryptionException(e);
+        }
+        return value;
+    }
+
+    protected <T> String encryptToString(T object) throws EncryptionException {
         String result;
         try {
             final Buffer buffer = new Buffer();
@@ -68,22 +84,18 @@ public class SecuredPreferenceHelper {
         return result;
     }
 
-    public <T> T decrypt(String encyptedValue, T defValue) throws EncryptionException {
-        T value = defValue;
-        if (encyptedValue != null) {
-            try {
-                final byte[] decodedBytes = decode(encyptedValue);
-                final byte[] decoded = helper.decrypt(decodedBytes);
-                final Buffer buffer = new Buffer().write(decoded);
-                final ObjectInputStream objectInputStream = new ObjectInputStream(buffer.inputStream());
-                value = (T) objectInputStream.readObject();
-            } catch (IOException e) {
-                throw new EncryptionException(e);
-            } catch (ClassNotFoundException e) {
-                throw new EncryptionException(e);
-            }
-        }
-        return value;
+    /**
+     * Using Squares Okio methods to convert data into base64 string
+     */
+    protected String encode(byte[] input) {
+        return ByteString.of(input).base64();
+    }
+
+    /**
+     * Using Squares Okio method to convert Base64 string into a ByteArray
+     */
+    protected byte[] decode(String input) {
+        return ByteString.decodeBase64(input).toByteArray();
     }
 
 }
