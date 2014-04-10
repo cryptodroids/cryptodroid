@@ -2,6 +2,7 @@
 .DS_Store
 
 # Idea
+.idea/
 /.idea/workspace.xml
 *.iml
 
