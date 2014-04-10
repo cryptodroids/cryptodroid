@@ -3,6 +3,7 @@
 
 # Idea
 /.idea/workspace.xml
+*.iml
 
 # Built application files
 *.apk
