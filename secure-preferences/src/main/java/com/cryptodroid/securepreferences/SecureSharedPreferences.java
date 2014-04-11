@@ -27,7 +27,7 @@ public class SecureSharedPreferences implements SharedPreferences {
      * @param context application context of some kind
      * @param helper  the {@link com.cryptodroids.encryption.EncryptionHelper} to use to encrypt/decrypt data
      */
-    public static SharedPreferences getDefaultSharedPreference(Context context, EncryptionHelper helper) {
+    public static SharedPreferences getDefaultSharedPreferences(Context context, EncryptionHelper helper) {
         final SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return new SecureSharedPreferences(defaultSharedPreferences, helper);
     }
@@ -46,12 +46,12 @@ public class SecureSharedPreferences implements SharedPreferences {
      * @see Context#MODE_WORLD_WRITEABLE
      * @see Context#MODE_MULTI_PROCESS
      */
-    public static SharedPreferences getSharedPreference(Context context, String name, int mode, EncryptionHelper helper) {
+    public static SharedPreferences getSharedPreferences(Context context, String name, int mode, EncryptionHelper helper) {
         final SharedPreferences sharedPreferences = context.getSharedPreferences(name, mode);
         return new SecureSharedPreferences(sharedPreferences, helper);
     }
 
-    private final SharedPreferences prefs;
+    private final SharedPreferences sharedPreferences;
     private final SecuredPreferenceHelper helper;
 
     /**
@@ -62,64 +62,68 @@ public class SecureSharedPreferences implements SharedPreferences {
      * @param encryptionHelper The {@link com.cryptodroids.encryption.EncryptionHelper} to use.
      */
     private SecureSharedPreferences(SharedPreferences preferences, EncryptionHelper encryptionHelper) {
-        this.prefs = preferences;
+        this.sharedPreferences = preferences;
         this.helper = new SecuredPreferenceHelper(encryptionHelper);
     }
 
     @Override
     public boolean contains(String key) {
-        return prefs.contains(key);
+        return sharedPreferences.contains(key);
     }
 
     @Override
     public SecuredEditor edit() {
-        return new SecuredEditor(helper, prefs.edit());
+        return new SecuredEditor(helper, sharedPreferences.edit());
     }
 
     @Override
     public Map<String, ?> getAll() {
-        return prefs.getAll();
+        return sharedPreferences.getAll();
     }
 
     @Override
     public boolean getBoolean(String key, boolean defValue) {
-        return helper.decrypt(prefs, key, defValue);
+        return helper.decrypt(sharedPreferences, key, defValue);
     }
 
     @Override
     public float getFloat(String key, float defValue) {
-        return helper.decrypt(prefs, key, defValue);
+        return helper.decrypt(sharedPreferences, key, defValue);
     }
 
     @Override
     public int getInt(String key, int defValue) {
-        return helper.decrypt(prefs, key, defValue);
+        return helper.decrypt(sharedPreferences, key, defValue);
     }
 
     @Override
     public long getLong(String key, long defValue) {
-        return helper.decrypt(prefs, key, defValue);
+        return helper.decrypt(sharedPreferences, key, defValue);
     }
 
     @Override
     public String getString(String key, String defValue) {
-        return helper.decrypt(prefs, key, defValue);
+        return helper.decrypt(sharedPreferences, key, defValue);
     }
 
     @TargetApi(value = Build.VERSION_CODES.HONEYCOMB)
     @Override
     public Set<String> getStringSet(String key, Set<String> defValues) {
-        return helper.decrypt(prefs, key, defValues);
+        return helper.decrypt(sharedPreferences, key, defValues);
     }
 
     @Override
     public void registerOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-        prefs.registerOnSharedPreferenceChangeListener(listener);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
     }
 
     @Override
     public void unregisterOnSharedPreferenceChangeListener(OnSharedPreferenceChangeListener listener) {
-        prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    protected SharedPreferences getWrappedSharedPreference() {
+        return sharedPreferences;
     }
 
 }

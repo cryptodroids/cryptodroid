@@ -1,5 +1,10 @@
 package com.cryptodroid.securepreferences;
 
+import android.app.Application;
+import android.content.Context;
+
+import com.cryptodroids.encryption.NoEncryptionHelper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import static org.fest.assertions.api.Assertions.assertThat;
 
 /**
  * Created by chris on 11/04/2014.
@@ -16,27 +23,40 @@ import org.robolectric.annotation.Config;
 @RunWith(RobolectricTestRunner.class)
 public class SecureSharedPreferencesTest {
 
-    SecureSharedPreferences secureSharedPreferences;
+    private Application application;
+    private SecureSharedPreferences secureSharedPreferences;
+    private NoEncryptionHelper noEncryptionHelper = new NoEncryptionHelper();
 
     @Before
     public void setUp() throws Exception {
-//        Robolectric.application
-//                secureSharedPreferences = new SecureSharedPreferences()
+        application = Robolectric.application;
     }
 
     @After
     public void tearDown() throws Exception {
-
+        application = null;
     }
 
     @Test
     public void testGetDefaultSharedPreference() throws Exception {
+        final SecureSharedPreferences defaultSecureSharedPreferences = (SecureSharedPreferences) SecureSharedPreferences.getDefaultSharedPreferences(application, noEncryptionHelper);
 
+        // Check instantiation
+        assertThat(defaultSecureSharedPreferences).isNotNull();
+
+        // Check populated
+        assertThat(defaultSecureSharedPreferences.getWrappedSharedPreference()).isNotNull();
     }
 
     @Test
     public void testGetSharedPreference() throws Exception {
+        final SecureSharedPreferences secureSharedPreferences = (SecureSharedPreferences) SecureSharedPreferences.getSharedPreferences(application, "secure", Context.MODE_PRIVATE, noEncryptionHelper);
 
+        // Check instantiation
+        assertThat(secureSharedPreferences).isNotNull();
+
+        // Check populated
+        assertThat(secureSharedPreferences.getWrappedSharedPreference()).isNotNull();
     }
 
     @Test
