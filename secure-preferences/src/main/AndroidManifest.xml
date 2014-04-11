@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cryptodroid.securepreferences">
+
     <application android:allowBackup="true" />
 </manifest>

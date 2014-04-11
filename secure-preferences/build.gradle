@@ -1,4 +1,6 @@
 apply plugin: 'android-library'
+apply plugin: 'android-test'
+
 
 android {
     compileSdkVersion 19
@@ -10,17 +12,35 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    sourceSets {
+        androidTest.setRoot('src/test')
+    }
+
     buildTypes {
         release {
             runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+}
+
+androidTest {
+    // configure the set of classes for JUnit tests
+    include '**/*Test.class'
+    exclude '**/espresso/**/*.class'
+
+    // configure max heap size of the test JVM
+    maxHeapSize = "2048m"
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':encryption-core')
     compile 'com.squareup.okio:okio:+'
+
+//    Testing
+    androidTestCompile 'junit:junit:4.10'
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
+    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
 
 }
